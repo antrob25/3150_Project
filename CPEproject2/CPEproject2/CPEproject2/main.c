@@ -8,8 +8,9 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <avr/sfr_defs.h>
+#include <stdlib.h>
 
-#define F_CPU 16000000UL
+#define F_CPU			16000000UL
 #define BUTTON_DDR		DDRA
 #define BUTTON_PORT		PORTA
 #define BUTTON_PIN		PINA
@@ -19,6 +20,7 @@
 #define TIMER_START		PINA4
 #define COUNTER_MAX		9
 #define BAUDRATE		9600
+#define MYUBBR			F_CPU/16/BAUDRATE - 1
 #define BEEP_DDR		DDRE
 #define BEEP_PORT		PORTE
 
@@ -32,23 +34,25 @@ unsigned int stopwatch();
 void beep_init();
 void start_beep();
 void stop_beep();
-//void USART_Init();
-//char USART_RxChar();
-//void USART_TxChar(char data);
+void USART_Init();
+char USART_RxChar();
+void USART_TxChar(char data);
+void serial_output(unsigned int output);
 
 int main(void)
 {
-	//USART_Init();
+	USART_Init();
 	display_init();
 	stopwatch_init();
 	beep_init();
 	sei();
 	
-	//unsigned int stopwatch_time = 0;
+	unsigned int stopwatch_time = 0;
 	
     while (1) 
     {
-		stopwatch();
+		stopwatch_time = stopwatch();
+		serial_output(stopwatch_time);
 		timer_mode();
     }
 }
@@ -146,10 +150,10 @@ unsigned int stopwatch()
 	}
 	return total_time;
 }
-/*
+
 void USART_Init()	
 {
-	unsigned int ubbr_value = (F_CPU/(16*BAUDRATE))-1; //Define prescale value
+	unsigned int ubbr_value = MYUBBR; 
     //Set UBRR register for desired baud rate
 	UBRR0L = ubbr_value;
 	UBRR0H = ( ubbr_value>>8 );
@@ -181,7 +185,20 @@ void USART_TxChar(char data)
 	UDR0 = data; //Write data to be transmitting in UDR
 	while (bit_is_clear(UCSR0A, TXC)); //Wait until data transmit and buffer get empty
 	UCSR0A |= ( 1<<TXC );
-}*/
+}
+
+void serial_output(unsigned int output)
+{
+	char output_array[32];
+	unsigned int array_size;
+	itoa( output, output_array, 10 );
+	array_size = sizeof(output_array);
+	
+	for (  int i = 0; i < array_size; i++ )
+	{
+		USART_TxChar(output_array[i]);
+	}
+}
 
 void timer_mode()
 {
