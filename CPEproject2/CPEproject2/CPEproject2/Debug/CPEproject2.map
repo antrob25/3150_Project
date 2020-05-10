@@ -2,6 +2,8 @@ Archive member included to satisfy reference by file (symbol)
 
 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
                               D:/Programs/Atmel/7.0/Packs/Atmel/ATmega_DFP/1.4.351/gcc/dev/atmega324pb/avr5/crtatmega324pb.o (exit)
+d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+                              main.o (__tablejump2__)
 
 Discarded input sections
 
@@ -10,6 +12,15 @@ Discarded input sections
  .text          0x00000000        0x0 main.o
  .data          0x00000000        0x0 main.o
  .bss           0x00000000        0x0 main.o
+ .text.tenth_delay
+                0x00000000       0x20 main.o
+ .text.display  0x00000000       0x66 main.o
+ .progmem.gcc_sw_table.display
+                0x00000000       0x16 main.o
+ .text.stopwatch
+                0x00000000       0x2c main.o
+ .text.timer_mode
+                0x00000000       0x5c main.o
  .text          0x00000000        0x0 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
  .data          0x00000000        0x0 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
  .bss           0x00000000        0x0 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
@@ -26,6 +37,22 @@ Discarded input sections
                 0x00000000        0x0 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
  .text.libgcc.fixed
                 0x00000000        0x0 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .text          0x00000000        0x0 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .data          0x00000000        0x0 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .bss           0x00000000        0x0 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.mul
+                0x00000000        0x0 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.div
+                0x00000000        0x0 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc   0x00000000        0xc d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.prologue
+                0x00000000        0x0 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.builtins
+                0x00000000        0x0 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.fmul
+                0x00000000        0x0 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+ .text.libgcc.fixed
+                0x00000000        0x0 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
 
 Memory Configuration
 
@@ -153,7 +180,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x138
+.text           0x00000000      0x10a
  *(.vectors)
  .vectors       0x00000000       0xcc D:/Programs/Atmel/7.0/Packs/Atmel/ATmega_DFP/1.4.351/gcc/dev/atmega324pb/avr5/crtatmega324pb.o
                 0x00000000                __vector_default
@@ -261,16 +288,19 @@ END GROUP
                 0x000000e0                __vector_42
                 0x000000e4                . = ALIGN (0x2)
  *(.text.*)
- .text.tenth_delay
-                0x000000e4       0x20 main.o
-                0x000000e4                tenth_delay
- .text.main     0x00000104       0x30 main.o
-                0x00000104                main
-                0x00000134                . = ALIGN (0x2)
+ .text.stopwatch_init
+                0x000000e4        0x8 main.o
+                0x000000e4                stopwatch_init
+ .text.display_init
+                0x000000ec        0xe main.o
+                0x000000ec                display_init
+ .text.main     0x000000fa        0xc main.o
+                0x000000fa                main
+                0x00000106                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000134        0x0 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
-                0x00000134                _exit
-                0x00000134                exit
+ .fini9         0x00000106        0x0 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+                0x00000106                _exit
+                0x00000106                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -289,11 +319,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000134        0x4 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .fini0         0x00000106        0x4 d:/programs/atmel/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
  *(.fini0)
-                0x00000138                _etext = .
+                0x0000010a                _etext = .
 
-.data           0x00800100        0x0 load address 0x00000138
+.data           0x00800100        0x0 load address 0x0000010a
                 [!provide]                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -311,8 +341,8 @@ END GROUP
  *(.bss*)
  *(COMMON)
                 [!provide]                PROVIDE (__bss_end, .)
-                0x00000138                __data_load_start = LOADADDR (.data)
-                0x00000138                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x0000010a                __data_load_start = LOADADDR (.data)
+                0x0000010a                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800100        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
@@ -383,42 +413,42 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000       0x28
+.debug_aranges  0x00000000       0x50
  *(.debug_aranges)
  .debug_aranges
-                0x00000000       0x28 main.o
+                0x00000000       0x50 main.o
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000      0xa8b
+.debug_info     0x00000000      0xb89
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x9bb D:/Programs/Atmel/7.0/Packs/Atmel/ATmega_DFP/1.4.351/gcc/dev/atmega324pb/avr5/crtatmega324pb.o
- .debug_info    0x000009bb       0xd0 main.o
+ .debug_info    0x000009bb      0x1ce main.o
 
-.debug_abbrev   0x00000000      0x9ba
+.debug_abbrev   0x00000000      0xa37
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x934 D:/Programs/Atmel/7.0/Packs/Atmel/ATmega_DFP/1.4.351/gcc/dev/atmega324pb/avr5/crtatmega324pb.o
- .debug_abbrev  0x00000934       0x86 main.o
+ .debug_abbrev  0x00000934      0x103 main.o
 
-.debug_line     0x00000000      0x2dc
+.debug_line     0x00000000      0x473
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x1ca D:/Programs/Atmel/7.0/Packs/Atmel/ATmega_DFP/1.4.351/gcc/dev/atmega324pb/avr5/crtatmega324pb.o
- .debug_line    0x000001ca      0x112 main.o
+ .debug_line    0x000001ca      0x2a9 main.o
 
-.debug_frame    0x00000000       0x34
+.debug_frame    0x00000000       0x9c
  *(.debug_frame)
- .debug_frame   0x00000000       0x34 main.o
+ .debug_frame   0x00000000       0x9c main.o
 
-.debug_str      0x00000000      0x4d4
+.debug_str      0x00000000      0x51d
  *(.debug_str)
  .debug_str     0x00000000      0x35a D:/Programs/Atmel/7.0/Packs/Atmel/ATmega_DFP/1.4.351/gcc/dev/atmega324pb/avr5/crtatmega324pb.o
- .debug_str     0x0000035a      0x17a main.o
-                                0x1ae (size before relaxing)
+ .debug_str     0x0000035a      0x1c3 main.o
+                                0x1fc (size before relaxing)
 
-.debug_loc      0x00000000       0x44
+.debug_loc      0x00000000      0x1f4
  *(.debug_loc)
- .debug_loc     0x00000000       0x44 main.o
+ .debug_loc     0x00000000      0x1f4 main.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -438,9 +468,9 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000       0x18
+.debug_ranges   0x00000000       0x40
  *(.debug_ranges)
- .debug_ranges  0x00000000       0x18 main.o
+ .debug_ranges  0x00000000       0x40 main.o
 
 .debug_macro
  *(.debug_macro)

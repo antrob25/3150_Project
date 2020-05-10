@@ -3,29 +3,29 @@ CPEproject2.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000000  00800100  00800100  0000018c  2**0
+  0 .data         00000000  00800100  00800100  0000015e  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         00000138  00000000  00000000  00000054  2**1
+  1 .text         0000010a  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .comment      00000030  00000000  00000000  0000018c  2**0
+  2 .comment      00000030  00000000  00000000  0000015e  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000001bc  2**2
+  3 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000190  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000028  00000000  00000000  000001fc  2**0
+  4 .debug_aranges 00000050  00000000  00000000  000001d0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000a8b  00000000  00000000  00000224  2**0
+  5 .debug_info   00000b89  00000000  00000000  00000220  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 000009ba  00000000  00000000  00000caf  2**0
+  6 .debug_abbrev 00000a37  00000000  00000000  00000da9  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000002dc  00000000  00000000  00001669  2**0
+  7 .debug_line   00000473  00000000  00000000  000017e0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000034  00000000  00000000  00001948  2**2
+  8 .debug_frame  0000009c  00000000  00000000  00001c54  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000004d4  00000000  00000000  0000197c  2**0
+  9 .debug_str    0000051d  00000000  00000000  00001cf0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00000044  00000000  00000000  00001e50  2**0
+ 10 .debug_loc    000001f4  00000000  00000000  0000220d  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000018  00000000  00000000  00001e94  2**0
+ 11 .debug_ranges 00000040  00000000  00000000  00002401  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -90,109 +90,59 @@ Disassembly of section .text:
   d2:	d8 e0       	ldi	r29, 0x08	; 8
   d4:	de bf       	out	0x3e, r29	; 62
   d6:	cd bf       	out	0x3d, r28	; 61
-  d8:	0e 94 82 00 	call	0x104	; 0x104 <main>
-  dc:	0c 94 9a 00 	jmp	0x134	; 0x134 <_exit>
+  d8:	0e 94 7d 00 	call	0xfa	; 0xfa <main>
+  dc:	0c 94 83 00 	jmp	0x106	; 0x106 <_exit>
 
 000000e0 <__bad_interrupt>:
   e0:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
 
-000000e4 <tenth_delay>:
-    }
+000000e4 <stopwatch_init>:
+	TIFR1 = 0x1<<TOV1;
 }
 
-void tenth_delay()
+void stopwatch_init()
 {
-	TCNT1H = 0xF3;
-  e4:	83 ef       	ldi	r24, 0xF3	; 243
-  e6:	80 93 85 00 	sts	0x0085, r24	; 0x800085 <__TEXT_REGION_LENGTH__+0x7f8085>
-	TCNT1L = 0xCB;
-  ea:	8b ec       	ldi	r24, 0xCB	; 203
-  ec:	80 93 84 00 	sts	0x0084, r24	; 0x800084 <__TEXT_REGION_LENGTH__+0x7f8084>
-	TCCR1B = 0x04;
-  f0:	84 e0       	ldi	r24, 0x04	; 4
-  f2:	80 93 81 00 	sts	0x0081, r24	; 0x800081 <__TEXT_REGION_LENGTH__+0x7f8081>
-	
-	while ( ( TIFR1& ( 0x1<<TOV1 ) ) == 0 );
-  f6:	b0 9b       	sbis	0x16, 0	; 22
-  f8:	fe cf       	rjmp	.-4      	; 0xf6 <tenth_delay+0x12>
-	
-	TCCR1B = 0;
-  fa:	10 92 81 00 	sts	0x0081, r1	; 0x800081 <__TEXT_REGION_LENGTH__+0x7f8081>
-	TIFR1 = 0x1<<TOV1;
-  fe:	81 e0       	ldi	r24, 0x01	; 1
- 100:	86 bb       	out	0x16, r24	; 22
- 102:	08 95       	ret
+	BUTTON_DDR = 0x00;
+  e4:	11 b8       	out	0x01, r1	; 1
+	BUTTON_PORT = 0xFF;
+  e6:	8f ef       	ldi	r24, 0xFF	; 255
+  e8:	82 b9       	out	0x02, r24	; 2
+  ea:	08 95       	ret
 
-00000104 <main>:
+000000ec <display_init>:
+	}
+}
 
-ISR(INT0_vect);
+void display_init()
+{
+	DDRD = 0xFF;
+  ec:	8f ef       	ldi	r24, 0xFF	; 255
+  ee:	8a b9       	out	0x0a, r24	; 10
+	DDRE = 0x20;
+  f0:	80 e2       	ldi	r24, 0x20	; 32
+  f2:	8d b9       	out	0x0d, r24	; 13
+	PORTD = 0x00;
+  f4:	1b b8       	out	0x0b, r1	; 11
+	PORTE = 0x00;
+  f6:	1e b8       	out	0x0e, r1	; 14
+  f8:	08 95       	ret
+
+000000fa <main>:
+//void USART_TxChar(char data);
 
 int main(void)
 {
-	BUTTON_DDR = 0x00;
- 104:	11 b8       	out	0x01, r1	; 1
-	BUTTON_PORT = 0xFF;
- 106:	8f ef       	ldi	r24, 0xFF	; 255
- 108:	82 b9       	out	0x02, r24	; 2
 	//USART_Init();
+	display_init();
+  fa:	0e 94 76 00 	call	0xec	; 0xec <display_init>
+	stopwatch_init();
+  fe:	0e 94 72 00 	call	0xe4	; 0xe4 <stopwatch_init>
 	sei();
- 10a:	78 94       	sei
-	
-	unsigned int stopwatch_enable = 0;
-	unsigned int stopwatch_counter = 0;
- 10c:	c0 e0       	ldi	r28, 0x00	; 0
- 10e:	d0 e0       	ldi	r29, 0x00	; 0
-	
-    while (1) 
-    {
-		if ( bit_is_clear( BUTTON_PIN, STOPWATCH_START ) )
- 110:	07 99       	sbic	0x00, 7	; 0
- 112:	fe cf       	rjmp	.-4      	; 0x110 <main+0xc>
-		{
-			while ( bit_is_clear( BUTTON_PIN, STOPWATCH_START ) );
- 114:	07 9b       	sbis	0x00, 7	; 0
- 116:	fe cf       	rjmp	.-4      	; 0x114 <main+0x10>
-			
-			stopwatch_enable = 1;
-			
-			while ( stopwatch_enable == 1 )
-			{
-				tenth_delay();
- 118:	0e 94 72 00 	call	0xe4	; 0xe4 <tenth_delay>
-				
-				if ( stopwatch_counter == COUNTER_MAX )
- 11c:	c9 30       	cpi	r28, 0x09	; 9
- 11e:	d1 05       	cpc	r29, r1
- 120:	11 f0       	breq	.+4      	; 0x126 <main+0x22>
-					stopwatch_counter = 0;
-				
-				else
-					stopwatch_counter++;
- 122:	21 96       	adiw	r28, 0x01	; 1
- 124:	02 c0       	rjmp	.+4      	; 0x12a <main+0x26>
-			while ( stopwatch_enable == 1 )
-			{
-				tenth_delay();
-				
-				if ( stopwatch_counter == COUNTER_MAX )
-					stopwatch_counter = 0;
- 126:	c0 e0       	ldi	r28, 0x00	; 0
- 128:	d0 e0       	ldi	r29, 0x00	; 0
-				
-				else
-					stopwatch_counter++;
-					
-				if ( bit_is_clear( BUTTON_PIN, STOPWATCH_STOP ) )	
- 12a:	06 99       	sbic	0x00, 6	; 0
- 12c:	f5 cf       	rjmp	.-22     	; 0x118 <main+0x14>
-				{
-					while ( bit_is_clear( BUTTON_PIN, STOPWATCH_STOP ) );
- 12e:	06 9b       	sbis	0x00, 6	; 0
- 130:	fe cf       	rjmp	.-4      	; 0x12e <main+0x2a>
- 132:	ee cf       	rjmp	.-36     	; 0x110 <main+0xc>
+ 102:	78 94       	sei
+ 104:	ff cf       	rjmp	.-2      	; 0x104 <main+0xa>
 
-00000134 <_exit>:
- 134:	f8 94       	cli
+00000106 <_exit>:
+ 106:	f8 94       	cli
 
-00000136 <__stop_program>:
- 136:	ff cf       	rjmp	.-2      	; 0x136 <__stop_program>
+00000108 <__stop_program>:
+ 108:	ff cf       	rjmp	.-2      	; 0x108 <__stop_program>

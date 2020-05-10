@@ -24,49 +24,22 @@ void tenth_delay();
 void timer_mode();
 void display(char);
 void display_init();
+void stopwatch_init();
+void stopwatch();
 //void USART_Init();
 //char USART_RxChar();
 //void USART_TxChar(char data);
 
-ISR(INT0_vect);
-
 int main(void)
 {
-	BUTTON_DDR = 0x00;
-	BUTTON_PORT = 0xFF;
 	//USART_Init();
+	display_init();
+	stopwatch_init();
 	sei();
-	
-	unsigned int stopwatch_enable = 0;
-	unsigned int stopwatch_counter = 0;
 	
     while (1) 
     {
-		if ( bit_is_clear( BUTTON_PIN, STOPWATCH_START ) )
-		{
-			while ( bit_is_clear( BUTTON_PIN, STOPWATCH_START ) );
-			
-			stopwatch_enable = 1;
-			
-			while ( stopwatch_enable == 1 )
-			{
-				tenth_delay();
-				
-				if ( stopwatch_counter == COUNTER_MAX )
-					stopwatch_counter = 0;
-				
-				else
-					stopwatch_counter++;
-					
-				if ( bit_is_clear( BUTTON_PIN, STOPWATCH_STOP ) )	
-				{
-					while ( bit_is_clear( BUTTON_PIN, STOPWATCH_STOP ) );
-					
-					stopwatch_enable = 0;
-					
-				}
-			}
-		}
+		
     }
 }
 
@@ -80,6 +53,46 @@ void tenth_delay()
 	
 	TCCR1B = 0;
 	TIFR1 = 0x1<<TOV1;
+}
+
+void stopwatch_init()
+{
+	BUTTON_DDR = 0x00;
+	BUTTON_PORT = 0xFF;
+}
+
+void stopwatch()
+{
+	unsigned int stopwatch_enable = 0;
+	unsigned char stopwatch_counter = '0';
+	
+	if ( bit_is_clear( BUTTON_PIN, STOPWATCH_START ) )
+	{
+		while ( bit_is_clear( BUTTON_PIN, STOPWATCH_START ) );
+		
+		stopwatch_enable = 1;
+		
+		while ( stopwatch_enable == 1 )
+		{
+			tenth_delay();
+			
+			if ( stopwatch_counter == COUNTER_MAX )
+				stopwatch_counter = '0';
+			
+			else
+				stopwatch_counter++;
+			
+			if ( bit_is_clear( BUTTON_PIN, STOPWATCH_STOP ) )
+			{
+				while ( bit_is_clear( BUTTON_PIN, STOPWATCH_STOP ) );
+				
+				stopwatch_enable = '0';
+				
+			}
+		}
+		
+		display(stopwatch_counter);
+	}
 }
 /*
 void USART_Init()	
