@@ -19,13 +19,19 @@
 #define TIMER_START		PINA4
 #define COUNTER_MAX		9
 #define BAUDRATE		9600
+#define BEEP_DDR		DDRE
+#define BEEP_PORT		PORTE
 
 void tenth_delay();
+void hundredth_delay();
 void timer_mode();
 void display(char);
 void display_init();
 void stopwatch_init();
-void stopwatch();
+unsigned int stopwatch();
+void beep_init();
+void start_beep();
+void stop_beep();
 //void USART_Init();
 //char USART_RxChar();
 //void USART_TxChar(char data);
@@ -35,11 +41,15 @@ int main(void)
 	//USART_Init();
 	display_init();
 	stopwatch_init();
+	beep_init();
 	sei();
+	
+	//unsigned int stopwatch_time = 0;
 	
     while (1) 
     {
-		
+		stopwatch();
+		timer_mode();
     }
 }
 
@@ -55,14 +65,50 @@ void tenth_delay()
 	TIFR1 = 0x1<<TOV1;
 }
 
+void hundredth_delay()
+{
+	TCNT1H = 0xFE;
+	TCNT1L = 0xC7;
+	TCCR1B = 0x04;
+	
+	while ( ( TIFR1& ( 0x1<<TOV1 ) ) == 0 );
+	
+	TCCR1B = 0;
+	TIFR1 = 0x1<<TOV1;
+}
+
+void beep_init()
+{
+	BEEP_DDR = 0x10;
+	BEEP_PORT = 0x00;
+}
+
+void start_beep()
+{
+	BEEP_PORT = 0x10;
+	tenth_delay();
+	BEEP_PORT = 0x00;
+}
+
+void stop_beep()
+{
+	BEEP_PORT = 0x10;
+	for ( int i = 0; i < 5; i++ )
+	{
+		hundredth_delay();
+	}
+	BEEP_PORT = 0x00;
+}
+
 void stopwatch_init()
 {
 	BUTTON_DDR = 0x00;
 	BUTTON_PORT = 0xFF;
 }
 
-void stopwatch()
+unsigned int stopwatch()
 {
+	unsigned int total_time = 0;
 	unsigned int stopwatch_enable = 0;
 	unsigned char stopwatch_counter = '0';
 	
@@ -70,6 +116,7 @@ void stopwatch()
 	{
 		while ( bit_is_clear( BUTTON_PIN, STOPWATCH_START ) );
 		
+		start_beep();
 		stopwatch_enable = 1;
 		
 		while ( stopwatch_enable == 1 )
@@ -77,22 +124,27 @@ void stopwatch()
 			tenth_delay();
 			
 			if ( stopwatch_counter == COUNTER_MAX )
+			{
 				stopwatch_counter = '0';
+				display(stopwatch_counter);
+			}
 			
 			else
+			{
 				stopwatch_counter++;
+				display(stopwatch_counter);
+			}
 			
 			if ( bit_is_clear( BUTTON_PIN, STOPWATCH_STOP ) )
 			{
 				while ( bit_is_clear( BUTTON_PIN, STOPWATCH_STOP ) );
 				
-				stopwatch_enable = '0';
-				
+				stop_beep();
+				stopwatch_enable = 0;
 			}
 		}
-		
-		display(stopwatch_counter);
 	}
+	return total_time;
 }
 /*
 void USART_Init()	
@@ -145,7 +197,7 @@ void timer_mode()
 		if(bit_is_clear(BUTTON_PIN, TIMER_START))
 		{
 			inputmode = 0;
-			//beepbeep
+			start_beep();
 		}
 	}
 	
@@ -157,7 +209,7 @@ void timer_mode()
 	
 	while(bit_is_set(BUTTON_PIN, TIMER_START))
 	{
-		//beepbeep
+		start_beep();
 		tenth_delay();
 	}
 }
