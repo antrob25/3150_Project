@@ -2,7 +2,7 @@
  * CPEproject2.c
  *
  * Created: 5/9/2020 3:46:04 PM
- * Author : Anthony Robles
+ * Author : Anthony Robles, Sithija Gunasinghe, Cade Johnstone, Daniel Napierkowsi
  */ 
 
 #include <avr/io.h>
@@ -39,6 +39,9 @@ char USART_RxChar();
 void USART_TxChar(char data);
 void serial_output(unsigned int output);
 
+//A constant character array that is the menu for selecting the timer modes
+const char menu[59] = "To select stopwatch mode send 1 To select timer mode send 2";
+
 int main(void)
 {
 	USART_Init();
@@ -47,13 +50,34 @@ int main(void)
 	beep_init();
 	sei();
 	
+	char value;	//Character to be received by via the serial port
 	unsigned int stopwatch_time = 0;
 	
     while (1) 
     {
-		stopwatch_time = stopwatch();
-		serial_output(stopwatch_time);
-		timer_mode();
+	    value = '\0';
+	    
+	    //A for loop to output the menu
+	    for(int i = 0; i < 59; i++)
+	    {
+		    USART_TxChar(menu[i]);
+	    }
+		
+	    //while loop polls for received data keeps polling until a '1' or a '2' is received
+	    while(value != '1' && value != '2')
+	    {
+		    value = USART_RxChar();
+	    }
+	    
+	    if(value == '1')
+	    {
+		    stopwatch_time = stopwatch();  //Runs stopwatch mode if 1 was received
+		    serial_output(stopwatch_time);
+	    }
+	    else if(value == '2')
+	    {
+		    timer_mode(); //Runs in timer mode if 2 was received
+	    }
     }
 }
 
