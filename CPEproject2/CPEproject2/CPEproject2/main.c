@@ -15,10 +15,15 @@
 #define BUTTON_PIN		PINA
 #define STOPWATCH_START	PINA7
 #define STOPWATCH_STOP	PINA6
+#define TIMER_INPUT		PINA5
+#define TIMER_START		PINA4
 #define COUNTER_MAX		9
 #define BAUDRATE		9600
 
 void tenth_delay();
+void timer_mode();
+void display(char);
+void display_init();
 //void USART_Init();
 //char USART_RxChar();
 //void USART_TxChar(char data);
@@ -112,3 +117,93 @@ void USART_TxChar(char data)
 	while (bit_is_clear(UCSR0A, TXC)); //Wait until data transmit and buffer get empty
 	UCSR0A |= ( 1<<TXC );
 }*/
+
+void timer_mode()
+{
+	unsigned char input = 0;
+	char inputmode = 1;
+	while(inputmode)
+	{
+		if(bit_is_clear(BUTTON_PIN, TIMER_INPUT))
+		{
+			tenth_delay();
+			input++;
+		}
+		if(bit_is_clear(BUTTON_PIN, TIMER_START))
+		{
+			inputmode = 0;
+			//beepbeep
+		}
+	}
+	
+	while(input > 0)
+	{
+		display(input-- % 10);
+		tenth_delay();		
+	}
+	
+	while(bit_is_set(BUTTON_PIN, TIMER_START))
+	{
+		//beepbeep
+		tenth_delay();
+	}
+}
+
+void display_init()
+{
+	DDRD = 0xFF;
+	DDRE = 0x20;
+	PORTD = 0x00;
+	PORTE = 0x00;
+}
+void display(char num)
+{
+	switch(num)
+	{
+		case 0:
+			PORTD = 0xFF;
+			PORTE &= ~(1<<PORTE5);
+			break;
+		case 1:
+			PORTD = 0x01;
+			PORTE &= ~(1<<PORTE5);
+			break;
+		case 2:
+			PORTD = 0x02;
+			PORTE &= ~(1<<PORTE5);
+			break;
+		case 3:
+			PORTD = 0x04;
+			PORTE &= ~(1<<PORTE5);
+			break;
+		case 4:
+			PORTD = 0x08;
+			PORTE &= ~(1<<PORTE5);
+			break;
+		case 5:
+			PORTD = 0x00;
+			PORTE |= (1<<PORTE5);
+			break;
+		case 6:
+			PORTD = 0x10;
+			PORTE &= ~(1<<PORTE5);
+			break;
+		case 7:
+			PORTD = 0x20;
+			PORTE &= ~(1<<PORTE5);
+			break;
+		case 8:
+			PORTD = 0x40;
+			PORTE &= ~(1<<PORTE5);
+			break;
+		case 9:
+			PORTD = 0x80;
+			PORTE &= ~(1<<PORTE5);
+			break;
+		case 10: //for display off
+			PORTD = 0x00;
+			PORTE &= ~(1<<PORTE5);
+			break;
+	}
+	
+}
