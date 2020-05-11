@@ -18,6 +18,7 @@
 #define STOPWATCH_STOP	PINA6
 #define TIMER_INPUT		PINA5
 #define TIMER_START		PINA4
+#define STOPWATCH_SPLIT PINA3
 #define COUNTER_MAX		9
 #define BAUDRATE		9600
 #define MYUBBR			F_CPU/16/BAUDRATE - 1
@@ -30,7 +31,7 @@ void timer_mode();
 void display(char);
 void display_init();
 void stopwatch_init();
-unsigned int stopwatch();
+void stopwatch();
 void beep_init();
 void start_beep();
 void stop_beep();
@@ -51,7 +52,6 @@ int main(void)
 	sei();
 	
 	char value;	//Character to be received by via the serial port
-	unsigned int stopwatch_time = 0;
 	
     while (1) 
     {
@@ -71,8 +71,7 @@ int main(void)
 	    
 	    if(value == '1')
 	    {
-		    stopwatch_time = stopwatch();  //Runs stopwatch mode if 1 was received
-		    serial_output(stopwatch_time);
+		    stopwatch();  //Runs stopwatch mode if 1 was received
 	    }
 	    else if(value == '2')
 	    {
@@ -134,9 +133,11 @@ void stopwatch_init()
 	BUTTON_PORT = 0xFF;
 }
 
-unsigned int stopwatch()
+void stopwatch()
 {
 	unsigned int total_time = 0;
+	unsigned int split_time_checkpoint = 0;
+	unsigned int split_time;
 	unsigned int stopwatch_enable = 0;
 	unsigned char stopwatch_counter = '0';
 	
@@ -154,13 +155,31 @@ unsigned int stopwatch()
 			if ( stopwatch_counter == COUNTER_MAX )
 			{
 				stopwatch_counter = '0';
+				total_time++;
 				display(stopwatch_counter);
 			}
 			
 			else
 			{
 				stopwatch_counter++;
+				total_time++;
 				display(stopwatch_counter);
+			}
+			
+			//when pressed, finds the time since last split and outputs it to serial
+			if(bit_is_clear(BUTTON_PIN, STOPWATCH_SPLIT))
+			{
+				while ( bit_is_clear( BUTTON_PIN, STOPWATCH_SPLIT ) );
+				
+				//Subtract total time from last checkpoint to get the delta
+				split_time = total_time - split_time_checkpoint;
+				
+				//Get the new checkpoint value to compare for next split
+				split_time_checkpoint = total_time;
+				
+				//Output the split to serial
+				serial_output(split_time);
+				
 			}
 			
 			if ( bit_is_clear( BUTTON_PIN, STOPWATCH_STOP ) )
@@ -172,7 +191,7 @@ unsigned int stopwatch()
 			}
 		}
 	}
-	return total_time;
+	serial_output(total_time);
 }
 
 void USART_Init()	
