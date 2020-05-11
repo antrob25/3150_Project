@@ -18,12 +18,12 @@
 #define STOPWATCH_STOP	PINA6
 #define TIMER_INPUT		PINA5
 #define TIMER_START		PINA4
-#define STOPWATCH_SPLIT PINA3
+#define STOPWATCH_SPLIT	PINA3
 #define COUNTER_MAX		9
-#define BAUDRATE		9600
-#define MYUBBR			F_CPU/16/BAUDRATE - 1
 #define BEEP_DDR		DDRE
 #define BEEP_PORT		PORTE
+#define OUTPUT_DDR		DDRC
+#define OUTPUT_PORT		PORTC
 
 void tenth_delay();
 void hundredth_delay();
@@ -35,46 +35,31 @@ void stopwatch();
 void beep_init();
 void start_beep();
 void stop_beep();
-void USART_Init();
-char USART_RxChar();
-void USART_TxChar(char data);
-void serial_output(unsigned int output);
 
 //A constant character array that is the menu for selecting the timer modes
-const char menu[59] = "To select stopwatch mode send 1 To select timer mode send 2";
 
 int main(void)
 {
-	USART_Init();
 	display_init();
 	stopwatch_init();
 	beep_init();
 	sei();
-	
-	char value;	//Character to be received by via the serial port
+	OUTPUT_DDR = 0xFF;
+	OUTPUT_PORT = 0x00;
 	
     while (1) 
     {
-	    value = '\0';
-	    
-	    //A for loop to output the menu
-	    for(int i = 0; i < 59; i++)
-	    {
-		    USART_TxChar(menu[i]);
-	    }
-		
 	    //while loop polls for received data keeps polling until a '1' or a '2' is received
-	    while(value != '1' && value != '2')
-	    {
-		    value = USART_RxChar();
-	    }
+	    while((bit_is_set( BUTTON_PIN, PINA0 )) | (bit_is_clear( BUTTON_PIN, PINA1 )) );
 	    
-	    if(value == '1')
+	    if(bit_is_clear( BUTTON_PIN, PINA0 ))
 	    {
+			while ( bit_is_clear( BUTTON_PIN, PINA0 ) );
 		    stopwatch();  //Runs stopwatch mode if 1 was received
 	    }
-	    else if(value == '2')
+	    if(bit_is_clear( BUTTON_PIN, PINA1 ))
 	    {
+			while ( bit_is_clear( BUTTON_PIN, PINA1 ) );
 		    timer_mode(); //Runs in timer mode if 2 was received
 	    }
     }
@@ -106,8 +91,7 @@ void hundredth_delay()
 
 void beep_init()
 {
-	BEEP_DDR = 0x10;
-	BEEP_PORT = 0x00;
+	BEEP_DDR |= ( 1<<PINE4 );
 }
 
 void start_beep()
@@ -178,7 +162,7 @@ void stopwatch()
 				split_time_checkpoint = total_time;
 				
 				//Output the split to serial
-				serial_output(split_time);
+				OUTPUT_PORT = split_time;
 				
 			}
 			
@@ -190,57 +174,9 @@ void stopwatch()
 				stopwatch_enable = 0;
 			}
 		}
+		OUTPUT_PORT = total_time;
 	}
-	serial_output(total_time);
-}
-
-void USART_Init()	
-{
-	unsigned int ubbr_value = MYUBBR; 
-    //Set UBRR register for desired baud rate
-	UBRR0L = ubbr_value;
-	UBRR0H = ( ubbr_value>>8 );
 	
-	UCSR0B |= ( 1<<RXEN ) | ( 1<<TXEN ); //Enable USART transmitter and receiver
-	//Write USCRC for 8 bit data and 1 stop bit
-	UCSR0B |= ( 0<<UCSZ2 );
-	UCSR0C |= ( 1<<UCSZ1 ) | ( 1<<UCSZ0 );
-	UCSR0C &= ~( 1<<USBS );
-}
-
-char USART_RxChar()
-{
-	char rx_value;
-	//checks to see if there is a character to receive
-	if (bit_is_set(UCSR0A, RXC))
-	{
-		rx_value = UDR0;
-	}
-	else
-	{
-		rx_value = '\0';
-	}
-	return rx_value;
-}
-
-void USART_TxChar(char data)
-{
-	UDR0 = data; //Write data to be transmitting in UDR
-	while (bit_is_clear(UCSR0A, TXC)); //Wait until data transmit and buffer get empty
-	UCSR0A |= ( 1<<TXC );
-}
-
-void serial_output(unsigned int output)
-{
-	char output_array[32];
-	unsigned int array_size;
-	itoa( output, output_array, 10 );
-	array_size = sizeof(output_array);
-	
-	for (  int i = 0; i < array_size; i++ )
-	{
-		USART_TxChar(output_array[i]);
-	}
 }
 
 void timer_mode()
