@@ -50,16 +50,16 @@ int main(void)
     while (1) 
     {
 	    //while loop polls for received data keeps polling until a '1' or a '2' is received
-	    while((bit_is_set( BUTTON_PIN, PINA0 )) | (bit_is_clear( BUTTON_PIN, PINA1 )) );
+	    //while((bit_is_set( BUTTON_PIN, PINA0 )) || (bit_is_set( BUTTON_PIN, PINA1 )) );
 	    
-	    if(bit_is_clear( BUTTON_PIN, PINA0 ))
+	    if(bit_is_set( BUTTON_PIN, PINA0 ))
 	    {
-			while ( bit_is_clear( BUTTON_PIN, PINA0 ) );
+			while ( bit_is_set( BUTTON_PIN, PINA0 ) );
 		    stopwatch();  //Runs stopwatch mode if 1 was received
 	    }
-	    if(bit_is_clear( BUTTON_PIN, PINA1 ))
+	    if(bit_is_set( BUTTON_PIN, PINA1 ))
 	    {
-			while ( bit_is_clear( BUTTON_PIN, PINA1 ) );
+			while ( bit_is_set( BUTTON_PIN, PINA1 ) );
 		    timer_mode(); //Runs in timer mode if 2 was received
 	    }
     }
@@ -106,7 +106,7 @@ void stop_beep()
 	BEEP_PORT = 0x10;
 	for ( int i = 0; i < 5; i++ )
 	{
-		hundredth_delay();
+		//hundredth_delay();
 	}
 	BEEP_PORT = 0x00;
 }
@@ -124,17 +124,17 @@ void stopwatch()
 	unsigned int split_time;
 	unsigned int stopwatch_enable = 0;
 	unsigned char stopwatch_counter = '0';
-	
-	if ( bit_is_clear( BUTTON_PIN, STOPWATCH_START ) )
-	{
+	OUTPUT_DDR = 0xFF;
+//	if ( bit_is_set( BUTTON_PIN, STOPWATCH_START ) )
+//	{
 		while ( bit_is_clear( BUTTON_PIN, STOPWATCH_START ) );
 		
-		start_beep();
+		//start_beep();
 		stopwatch_enable = 1;
 		
 		while ( stopwatch_enable == 1 )
 		{
-			tenth_delay();
+			//tenth_delay();
 			
 			if ( stopwatch_counter == COUNTER_MAX )
 			{
@@ -151,9 +151,9 @@ void stopwatch()
 			}
 			
 			//when pressed, finds the time since last split and outputs it to serial
-			if(bit_is_clear(BUTTON_PIN, STOPWATCH_SPLIT))
+			if(bit_is_set(BUTTON_PIN, STOPWATCH_SPLIT))
 			{
-				while ( bit_is_clear( BUTTON_PIN, STOPWATCH_SPLIT ) );
+				while ( bit_is_set( BUTTON_PIN, STOPWATCH_SPLIT ) );
 				
 				//Subtract total time from last checkpoint to get the delta
 				split_time = total_time - split_time_checkpoint;
@@ -166,16 +166,16 @@ void stopwatch()
 				
 			}
 			
-			if ( bit_is_clear( BUTTON_PIN, STOPWATCH_STOP ) )
+			if ( bit_is_set( BUTTON_PIN, STOPWATCH_STOP ) )
 			{
-				while ( bit_is_clear( BUTTON_PIN, STOPWATCH_STOP ) );
+				while ( bit_is_set( BUTTON_PIN, STOPWATCH_STOP ) );
 				
-				stop_beep();
+				//stop_beep();
 				stopwatch_enable = 0;
 			}
 		}
 		OUTPUT_PORT = total_time;
-	}
+//	}
 	
 }
 
@@ -185,29 +185,31 @@ void timer_mode()
 	char inputmode = 1;
 	while(inputmode)
 	{
-		if(bit_is_clear(BUTTON_PIN, TIMER_INPUT))
+		if(bit_is_set(BUTTON_PIN, TIMER_INPUT))
 		{
-			tenth_delay();
+			//tenth_delay();
 			input++;
 		}
-		if(bit_is_clear(BUTTON_PIN, TIMER_START))
+		if(bit_is_set(BUTTON_PIN, TIMER_START))
 		{
 			inputmode = 0;
-			start_beep();
+			//start_beep();
 		}
 	}
 	
 	while(input > 0)
 	{
 		display(input-- % 10);
-		tenth_delay();		
+		//tenth_delay();		
 	}
 	
-	while(bit_is_set(BUTTON_PIN, TIMER_START))
+	while(bit_is_clear(BUTTON_PIN, TIMER_START))
 	{
-		start_beep();
-		tenth_delay();
+		display(0);
+		//start_beep();
+		//tenth_delay();
 	}
+	display(10);
 }
 
 void display_init()
